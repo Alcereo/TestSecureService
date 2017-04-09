@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+        xmlns="http://www.springframework.org/schema/security"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+        xmlns:p="http://www.springframework.org/schema/p"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
+
+    <http use-expressions="false" auto-config="true">
+
+        <!--Entry point for 403 code response if unauthorized-->
+        <http-basic
+                entry-point-ref="entryPoint"
+        />
+
+        <!--Our pre-filtering-->
+        <custom-filter position="PRE_AUTH_FILTER" ref="myFilter"/>
+
+
+        <csrf disabled="true"/>
+
+    </http>
+
+    <!--Entry point bean for 403 code response if unauthorized-->
+    <beans:bean id="entryPoint"
+                class="org.springframework.security.web.authentication.HttpStatusEntryPoint"
+                c:httpStatus="UNAUTHORIZED"
+    />
+
+    <!--Our pre-filtering bean-->
+    <beans:bean id="myFilter"
+        class="org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter"
+                p:principalRequestHeader="MY_AUTH"
+                p:authenticationManager-ref="myManager"
+    />
+
+    <authentication-manager id="myManager">
+        <authentication-provider ref="myProvider">
+        </authentication-provider>
+    </authentication-manager>
+
+    <beans:bean id="myProvider"
+        class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+        <beans:property name="preAuthenticatedUserDetailsService">
+            <beans:bean id="userDetailService"
+                        class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper"
+                        p:userDetailsService-ref="detailsManager"
+            />
+        </beans:property>
+    </beans:bean>
+
+    <user-service id="detailsManager">
+        <user name="admin"
+              authorities="ROLE_ServiceTestController.welcome, ROLE_ServiceTestController.get, ServiceTestController.add"
+        />
+
+        <user name="user1"
+              authorities="ROLE_ServiceTestController.welcome, ROLE_ServiceTestController.get"
+        />
+
+        <user name="user2"
+              authorities="ROLE_ServiceTestController.welcome"
+        />
+    </user-service>
+
+</beans:beans>
