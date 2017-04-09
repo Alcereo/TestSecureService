@@ -1,4 +1,4 @@
-- Rest service на Spring MVC
-- Spring Security с pre-authentication
+- Rest service on Spring MVC
+- Spring Security with pre-authentication
 - /get - getting list with groovy script filtering
 - Metrics
