@@ -1,14 +1,10 @@
 package ru.alcereo;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +12,8 @@ import java.util.List;
 public class EntityService{
 
     @Autowired
-    private SecureModule secure;
-
-    public void setSecure(SecureModule secure) {
-        this.secure = secure;
-    }
+    @Qualifier("EntityService.getList")
+    private ListSecure secure;
 
     private static List<TestEntity> dbList = new ArrayList<>();
 
@@ -33,7 +26,7 @@ public class EntityService{
     }
 
     public List<TestEntity> getList(){
-        return secure.secureList(() -> {
+        return secure.filter(() -> {
             return new ArrayList<>(dbList);
         });
     }
@@ -45,15 +38,15 @@ public class EntityService{
 
 //    Testing
     public static void main(String[] args) throws IOException {
-        EntityService service = new EntityService();
-        SecureModule secure = new SecureModule();
-
-        secure.setScript("false");
-        service.setSecure(secure);
-
-        List<TestEntity> list = service.getList();
-
-        System.out.println(list);
+//        EntityService service = new EntityService();
+//        ListSecure secure = new ListSecure("element.age > 18");
+//
+//        secure.setScript("false");
+//        service.setSecure(secure);
+//
+//        List<TestEntity> list = service.getList();
+//
+//        System.out.println(list);
 
     }
 }
